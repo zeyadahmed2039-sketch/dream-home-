@@ -12,7 +12,7 @@ services:
     buildCommand: npm install && npm run build
     preDeployCommand: npm run db:deploy
     startCommand: npm run start:prod
-    autoDeploy: true
+    autoDeployTrigger: commit
     envVars:
       # Render injects DATABASE_URL automatically when linked via `databases`.
       - key: DATABASE_URL
