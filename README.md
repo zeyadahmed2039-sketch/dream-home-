@@ -55,7 +55,7 @@ Buyers and renters can search property listings, save favorites, send inquiries,
 | Icons      | lucide-react                                      |
 | Tests      | Vitest (unit tests for utils & validation)        |
 
-> **Database:** The app runs on **SQLite** out of the box (zero setup) for local development and on **PostgreSQL** in production (Render). Every model uses `String` columns instead of DB enums, so switching between the two needs **zero model changes** — `scripts/prisma-provider.mjs` rewrites the datasource `provider` automatically based on `DATABASE_URL`.
+> **Database:** The app runs on **SQLite** out of the box (zero setup) for local development and on **PostgreSQL** in production (Render). `prisma/schema.prisma` is committed statically with `provider = "postgresql"` (the production target) and is **never mutated**. Local dev derives a gitignored SQLite copy (`prisma/schema.dev.prisma`) via `scripts/prisma-dev-schema.mjs`, driven by the `db:*` npm scripts.
 
 ---
 
@@ -180,22 +180,27 @@ src/
 - Models: `User`, `Account`, `Session`, `VerificationToken`, `PasswordResetToken`, `Property`, `PropertyImage`, `Amenity`, `PropertyAmenity`, `Favorite`, `Inquiry`, `Viewing`, `Notification`, `Report`.
 - Enums are stored as **String** columns (`"SALE"`, `"RENT"`, `"ACTIVE"`, etc.) for cross-provider compatibility.
 
-### Switching to PostgreSQL
+### Switching to PostgreSQL (production)
 
-The datasource provider is managed automatically by `scripts/prisma-provider.mjs`,
-which runs before every Prisma command. It detects the target from
-`DATABASE_URL` (or the `PRISMA_PROVIDER` env var):
+`prisma/schema.prisma` is **committed with `provider = "postgresql"`** and is never
+mutated by scripts. The production build (`npm run build` → `prisma generate`)
+and `npm run db:deploy` (`prisma migrate deploy`) use it directly, so the
+production database *is* PostgreSQL.
 
-- `DATABASE_URL="file:./dev.db"` → schema uses `sqlite` (local dev, zero setup)
-- `DATABASE_URL="postgresql://..."` → schema uses `postgresql` (production)
+Local development derives a SQLite copy (`prisma/schema.dev.prisma`, gitignored)
+from it via `scripts/prisma-dev-schema.mjs`. The `db:generate`, `db:push`,
+`db:seed`, and `db:studio` scripts run that generator first and target the copy
+with `--schema prisma/schema.dev.prisma`. Use `npm run db:push` + `npm run
+db:seed` locally (dev.db); do **not** use `db:migrate` for SQLite dev.
 
-So for production you only need to:
+For production you only need `DATABASE_URL` set to a PostgreSQL URL:
 
 ```env
 DATABASE_URL="postgresql://user:password@host:5432/dreamhome?schema=public"
 ```
 
-Then apply migrations (safe against existing data):
+Then apply migrations (safe against existing data — it only applies migrations
+that haven't run yet):
 
 ```bash
 npm run db:deploy   # runs prisma migrate deploy
@@ -207,7 +212,8 @@ Seed only if you want demo data (⚠️ **it deletes all existing data first**):
 npm run db:seed
 ```
 
-No model changes are required — the schema is provider-agnostic.
+No model changes are required — the schema is provider-agnostic and the two
+schema files share identical models.
 
 An initial PostgreSQL migration is committed at `prisma/migrations/0_init`.
 
@@ -220,7 +226,7 @@ See `render.yaml` (Render Blueprint) which provisions a **Web Service** and a
 
 - Build: `npm install && npm run build` (build generates Prisma client for Postgres)
 - Pre-deploy: `npm run db:deploy` (applies `prisma migrate deploy` — never resets data)
-- Start: `npm run start:prod` (binds to `$PORT`, so `next start -p ${PORT:-3000}`)
+- Start: `npm run start:prod` (cross-platform launcher that binds Next.js to `$PORT` via `scripts/start-prod.mjs`; Render injects `PORT`)
 - Storage: set `STORAGE_DRIVER=cloudinary` + Cloudinary credentials for persistent
   image uploads (Render's filesystem is ephemeral and wiped on every deploy).
 - Auth: set `NEXTAUTH_URL` and `NEXT_PUBLIC_APP_URL` to your live Render URL.

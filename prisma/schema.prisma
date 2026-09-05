@@ -1,14 +1,15 @@
 // Dream Home Online - Database Schema
 // =====================================================
-// This schema is intentionally provider-agnostic: it runs on BOTH PostgreSQL
-// (production on Render) and SQLite (local dev) with the SAME schema and ZERO
-// model changes.
+// This schema is committed with the datasource provider STATICALLY set to
+// "postgresql" - the production target (Render managed PostgreSQL). This file
+// is the single source of truth and is NEVER mutated by scripts; the production
+// build (`prisma generate && next build`) and `prisma migrate deploy` use it
+// directly, reading the connection from the DATABASE_URL environment variable.
 //
-// The datasource `provider` is NOT static in practice: the script
-// `scripts/prisma-provider.mjs` rewrites it automatically based on DATABASE_URL
-// (or PRISMA_PROVIDER) before every prisma command. This file is committed with
-// `postgresql` (the production target) so migrations and the Render build are
-// Postgres-correct by default.
+// Local development derives a SQLite copy at `prisma/schema.dev.prisma` via
+// `scripts/prisma-dev-schema.mjs` (gitignored), used only by the `db:*` scripts
+// prefixed with `node scripts/prisma-dev-schema.mjs`. It never touches this
+// file, the GitHub repo, or the PostgreSQL deployment.
 //
 // We use String fields (instead of DB enums) because SQLite does not support
 // enums and string columns map 1:1 to TEXT on PostgreSQL. Data integrity is

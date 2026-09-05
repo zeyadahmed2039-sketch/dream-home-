@@ -41,6 +41,8 @@ next-env.d.ts
 *.db
 *.db-journal
 prisma/dev.db*
+# generated local-dev-only SQLite schema (derived from the committed schema)
+prisma/schema.dev.prisma
 
 # runtime uploads (local dev only; production uses Cloudinary)
 public/uploads/

@@ -4,19 +4,18 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/prisma-provider.mjs && prisma generate && next build",
+    "build": "prisma generate && next build",
     "start": "next start",
-    "start:prod": "next start -p ${PORT:-3000}",
+    "start:prod": "node scripts/start-prod.mjs",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "db:generate": "node scripts/prisma-provider.mjs && prisma generate",
-    "db:migrate": "node scripts/prisma-provider.mjs && prisma migrate dev",
-    "db:deploy": "node scripts/prisma-provider.mjs && prisma migrate deploy",
-    "db:push": "node scripts/prisma-provider.mjs && prisma db push",
-    "db:seed": "node scripts/prisma-provider.mjs && prisma db seed",
-    "db:studio": "node scripts/prisma-provider.mjs && prisma studio"
+    "db:generate": "node scripts/prisma-dev-schema.mjs && prisma generate --schema prisma/schema.dev.prisma",
+    "db:deploy": "prisma migrate deploy",
+    "db:push": "node scripts/prisma-dev-schema.mjs && prisma db push --schema prisma/schema.dev.prisma",
+    "db:seed": "node scripts/prisma-dev-schema.mjs && prisma db seed --schema prisma/schema.dev.prisma",
+    "db:studio": "node scripts/prisma-dev-schema.mjs && prisma studio --schema prisma/schema.dev.prisma"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

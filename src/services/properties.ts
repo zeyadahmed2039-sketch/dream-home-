@@ -62,16 +62,24 @@ export async function getProperties(
     where.featured = featured;
   }
 
-  // Note: on SQLite, Prisma `contains` is case-insensitive by default. If you
-  // switch the provider to PostgreSQL, add `mode: "insensitive"` back to each
-  // filter below for case-insensitive matching.
+  // PostgreSQL `contains` is case-sensitive, so use `mode: "insensitive"` for
+  // case-insensitive keyword search in production. SQLite is case-insensitive
+  // by default and does not support `mode`, so gate it on the active provider.
+  // PostgreSQL `contains` is case-sensitive, so use `mode: "insensitive"` for
+  // case-insensitive keyword search in production. SQLite is case-insensitive by
+  // default and does not support `mode`, so gate it on the datasource URL.
+  const isPostgres = (process.env.DATABASE_URL || "").startsWith("postgres");
+  const caseFilter: Prisma.StringFilter = isPostgres
+    ? { mode: Prisma.QueryMode.insensitive }
+    : {};
+
   if (keyword) {
     where.OR = [
-      { title: { contains: keyword } },
-      { description: { contains: keyword } },
-      { address: { contains: keyword } },
-      { city: { contains: keyword } },
-      { state: { contains: keyword } },
+      { title: { contains: keyword, ...caseFilter } },
+      { description: { contains: keyword, ...caseFilter } },
+      { address: { contains: keyword, ...caseFilter } },
+      { city: { contains: keyword, ...caseFilter } },
+      { state: { contains: keyword, ...caseFilter } },
     ];
   }
 

@@ -13,7 +13,6 @@ import {
   Check,
   Phone,
   Mail,
-  Share2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,6 +23,7 @@ import { PropertyGallery } from "@/components/property/gallery";
 import { ContactAgentForm } from "@/components/property/contact-agent-form";
 import { ScheduleViewing } from "@/components/property/schedule-viewing";
 import { FavoriteButton } from "@/components/favorite-button";
+import { ShareButton } from "@/components/property/share-button";
 import { ReportPropertyDialog } from "@/components/property/report-property";
 import {
   getPropertyBySlug,
@@ -130,17 +130,7 @@ export default async function PropertyDetailPage({
           </p>
           <div className="flex gap-2">
             <FavoriteButton propertyId={property.id} defaultFavorite={isFav} />
-            <Button
-              variant="outline"
-              size="icon"
-              aria-label="Share"
-              onClick={() => {
-                if (navigator.share) navigator.share({ title: property.title, url: window.location.href });
-                else navigator.clipboard?.writeText(window.location.href);
-              }}
-            >
-              <Share2 className="h-4 w-4" />
-            </Button>
+            <ShareButton />
             <ReportPropertyDialog propertyId={property.id} propertyTitle={property.title} />
           </div>
         </div>
