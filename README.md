@@ -81,7 +81,7 @@ cp .env.example .env
 Key variables:
 ```env
 DATABASE_URL="file:./dev.db"
-AUTH_SECRET="<generate with: openssl rand -base64 32>"
+NEXTAUTH_SECRET="<generate with: openssl rand -base64 32>"
 NEXTAUTH_URL="http://localhost:3000"
 # Google OAuth (optional)
 GOOGLE_CLIENT_ID=
@@ -232,7 +232,7 @@ See `render.yaml` (Render Blueprint) which provisions a **Web Service** and a
 - Auth: set `NEXTAUTH_URL` and `NEXT_PUBLIC_APP_URL` to your live Render URL.
   The app falls back to Render's `RENDER_EXTERNAL_URL` automatically.
 
-Environment variables required in production: `DATABASE_URL`, `AUTH_SECRET`,
+Environment variables required in production: `DATABASE_URL`, `NEXTAUTH_SECRET`,
 `NEXTAUTH_URL`, `NEXT_PUBLIC_APP_URL`, `STORAGE_DRIVER`, `CLOUDINARY_CLOUD_NAME`,
 `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`. Optional: `GOOGLE_CLIENT_ID`,
 `GOOGLE_CLIENT_SECRET`.

@@ -111,5 +111,5 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
   },
-  secret: process.env.AUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET,
 };
